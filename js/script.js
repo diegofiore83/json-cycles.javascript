@@ -54,9 +54,9 @@ var JsonCycle = function () {
 
             var newObject = {};
             /* If it is an object, call the function recursively to every property of the object */
-            for (var name in newJsonElement) {
-              if (Object.prototype.hasOwnProperty.call(newJsonElement, name)) {
-                newObject[name] = fn(newJsonElement[name], path + '[' + JSON.stringify(name) + ']');
+            for (var _name in newJsonElement) {
+              if (Object.prototype.hasOwnProperty.call(newJsonElement, _name)) {
+                newObject[_name] = fn(newJsonElement[_name], path + '[' + JSON.stringify(_name) + ']');
               }
             }
             return newObject;
@@ -65,6 +65,51 @@ var JsonCycle = function () {
 
         return newJsonElement;
       }(input, '$');
+    }
+  }, {
+    key: 'decodeCycles',
+    value: function decodeCycles($) {
+
+      /* Regular Expression to identify JSON path */
+      var regExJsonPath = /^\$(?:\[(?:\d+|\"(?:[^\\\"\u0000-\u001f]|\\([\\\"\/bfnrt]|u[0-9a-zA-Z]{4}))*\")\])*$/;
+
+      (function fn(element) {
+        debugger;
+        if (element && (typeof element === 'undefined' ? 'undefined' : _typeof(element)) === 'object') {
+
+          if (Array.isArray(element)) {
+            /* If it is an array, call the function recursively to every element of the array */
+            for (var i = 0; i < element.length; i++) {
+              var item = element[i];
+              if (item && (typeof item === 'undefined' ? 'undefined' : _typeof(item)) === 'object') {
+                var path = item.$ref;
+                if (typeof path === 'string' && regExJsonPath.test(path)) {
+                  element[i] = eval(path);
+                } else {
+                  fn(item);
+                }
+              }
+            }
+          } else {
+            /* If it is an object, call the function recursively to every property of the object */
+            for (name in element) {
+              if (_typeof(element[name]) === 'object') {
+                var _item = element[name];
+                if (_item) {
+                  var _path = _item.$ref;
+                  if (typeof _path === 'string' && regExJsonPath.test(_path)) {
+                    element[name] = eval(_path);
+                  } else {
+                    fn(_item);
+                  }
+                }
+              }
+            }
+          }
+        }
+      })($);
+
+      return $;
     }
   }]);
 

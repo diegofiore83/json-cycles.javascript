@@ -57,4 +57,49 @@ class JsonCycle {
 
       }(input, '$'));
     }
+
+    decodeCycles($) {
+
+      /* Regular Expression to identify JSON path */
+      const regExJsonPath = /^\$(?:\[(?:\d+|\"(?:[^\\\"\u0000-\u001f]|\\([\\\"\/bfnrt]|u[0-9a-zA-Z]{4}))*\")\])*$/;
+
+      (function fn(element){
+        debugger;
+        if (element && typeof element === 'object') {
+
+          if (Array.isArray(element)) {
+            /* If it is an array, call the function recursively to every element of the array */
+            for (let i = 0; i < element.length; i ++) {
+              const item = element[i];
+              if (item && typeof item === 'object') {
+                const path = item.$ref;
+                if (typeof path === 'string' && regExJsonPath.test(path)) {
+                  element[i] = eval(path);
+                } else {
+                  fn(item);
+                }
+              }
+            }
+          } else {
+            /* If it is an object, call the function recursively to every property of the object */
+            for (name in element) {
+              if (typeof element[name] === 'object') {
+                const item = element[name];
+                if (item) {
+                  const path = item.$ref;
+                  if (typeof path === 'string' && regExJsonPath.test(path)) {
+                    element[name] = eval(path);
+                  } else {
+                    fn(item);
+                  }
+                }
+              }
+            }
+          }
+        }
+
+      }($));
+  
+      return $;
+    }
 }
