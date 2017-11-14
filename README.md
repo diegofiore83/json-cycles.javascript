@@ -1,8 +1,10 @@
 # JSON Cycle exercise
 
-## Notes
+## Details
 
-To run the project: 
+Write an algorithm to encode/decode circular structures for converting to and from JSON.
+
+## Run Istruction
 
 1) npm install (use grunt and jasmine)
 2) grunt
